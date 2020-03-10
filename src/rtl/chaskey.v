@@ -43,8 +43,7 @@ module chaskey(
                input wire           we,
                input wire [7 : 0]   addr,
                input wire [31 : 0]  write_data,
-               output wire [31 : 0] read_data,
-               output wire          ready
+               output wire [31 : 0] read_data
               );
 
 
@@ -129,7 +128,6 @@ module chaskey(
   // Concurrent connectivity for ports etc.
   //----------------------------------------------------------------
   assign read_data = tmp_read_data;
-  assign ready     = core_ready;
 
   assign core_block = {block_reg[0], block_reg[1], block_reg[2], block_reg[3]};
   assign core_key   = {key_reg[0], key_reg[1], key_reg[2], key_reg[3]};
