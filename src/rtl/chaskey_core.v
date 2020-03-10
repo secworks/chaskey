@@ -64,6 +64,17 @@ module chaskey_core(
   //----------------------------------------------------------------
   // Registers including update variables and write enable.
   //----------------------------------------------------------------
+  reg [127 : 0] key_reg;
+  reg           key_we;
+
+  reg [127 : 0] k1_reg;
+  reg [127 : 0] k1_new;
+  reg           k1_we;
+
+  reg [127 : 0] k2_reg;
+  reg [127 : 0] k2_new;
+  reg           k2_we;
+
   reg         ready_reg;
   reg         ready_new;
   reg         ready_we;
@@ -90,6 +101,14 @@ module chaskey_core(
   //----------------------------------------------------------------
   // Internal functions.
   //----------------------------------------------------------------
+  function [127 : 0] double_add(input [127 : 0] op);
+    begin
+      if (op[127])
+        double_add = {op[126 : 0], 1'h0} ^ 128'h87;
+      else
+        double_add = {op[126 : 0], 1'h0};
+    end
+  endfunction
 
 
   //----------------------------------------------------------------
@@ -99,6 +118,7 @@ module chaskey_core(
     begin: reg_update
       if (!reset_n)
         begin
+          key_reg       <= 128'h0;
           ready_reg     <= 1'h1;
           core_ctrl_reg <= CTRL_IDLE;
         end
