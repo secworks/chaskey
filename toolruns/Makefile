@@ -36,11 +36,11 @@
 #
 #===================================================================
 
-CORE_SRC=../src/rtl/chaskey_core.v
-TB_CORE_SRC =../src/tb/tb_chaskey_core.v
+CORE_SRC= ../src/rtl/chaskey_core.v
+TB_CORE_SRC = ../src/tb/tb_chaskey_core.v
 
-TOP_SRC=../src/rtl/chaskey.v $(CORE_SRC)
-TB_CORE_SRC =../src/tb/tb_chaskey.v
+TOP_SRC = ../src/rtl/chaskey.v $(CORE_SRC)
+TB_TOP_SRC = ../src/tb/tb_chaskey.v
 
 CC = iverilog
 CC_FLAGS = -Wall

@@ -41,7 +41,7 @@ module chaskey(
                input wire           reset_n,
                input wire           cs,
                input wire           we,
-               input wire [7 : 0]   addr,
+               input wire [7 : 0]   address,
                input wire [31 : 0]  write_data,
                output wire [31 : 0] read_data
               );
@@ -187,10 +187,10 @@ module chaskey(
             num_rounds_reg <= write_data[3 : 0];
 
           if (key_we)
-            key_reg[addr[1 : 0]] <= write_data;
+            key_reg[address[1 : 0]] <= write_data;
 
           if (block_we)
-            block_reg[addr[1 : 0]] <= write_data;
+            block_reg[address[1 : 0]] <= write_data;
         end
     end // reg_update
 
@@ -213,7 +213,7 @@ module chaskey(
         begin
           if (we)
             begin
-              case (addr)
+              case (address)
                 ADDR_CTRL:
                   begin
                     init_new     = write_data[CTRL_INIT_BIT];
@@ -231,16 +231,16 @@ module chaskey(
                   end
               endcase // case (addr)
 
-              if ((addr >= ADDR_KEY0) && (addr <= ADDR_KEY3))
+              if ((address >= ADDR_KEY0) && (address <= ADDR_KEY3))
                   key_we = 1'h1;
 
-              if ((addr >= ADDR_BLOCK0) && (addr <= ADDR_BLOCK3))
+              if ((address >= ADDR_BLOCK0) && (address <= ADDR_BLOCK3))
                 block_we = 1'h1;
             end
 
           else
             begin
-              case (addr)
+              case (address)
                 ADDR_NAME0:
                   tmp_read_data = CORE_NAME0;
 
@@ -259,10 +259,10 @@ module chaskey(
                 default:
                   begin
                   end
-              endcase // case (addr)
+              endcase // case (address)
 
-              if ((addr >= ADDR_TAG0) && (addr <= ADDR_TAG3))
-                tmp_read_data = core_tag[(3 - (addr - ADDR_TAG0)) * 32 +: 32];
+              if ((address >= ADDR_TAG0) && (address <= ADDR_TAG3))
+                tmp_read_data = core_tag[(3 - (address - ADDR_TAG0)) * 32 +: 32];
             end
         end
     end
