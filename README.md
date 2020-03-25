@@ -16,6 +16,11 @@ standardized by ISO/IEC.
 This core is a hardware implementation of the function written in
 Verilog. The core sports a top level wrapper with a 32-bit interface.
 
+This repository contains a reference model (in src/model) by the Chaskey
+author [NickyMouha](https://mouha.be/) on his [Chaskey
+page](https://mouha.be/chaskey/). The code is used here to generate test
+vectors and intermediate values.
+
 
 ## Implementation
 TBW.
