@@ -5,7 +5,7 @@
 // Testbench for the chaskey MAC.
 //
 // Author: Joachim Strombergson
-// Copyright (c) 2019, Assured AB
+// Copyright (c) 2020, Assured AB
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or

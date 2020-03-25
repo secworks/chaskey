@@ -6,7 +6,8 @@
 // This wrapper provides a 32-bit memory like interface.
 //
 //
-// Copyright (c) 2012, Secworks Sweden AB
+// Author: Joachim Strömbergson
+// Copyright (c) 2020, Assured AB
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or
