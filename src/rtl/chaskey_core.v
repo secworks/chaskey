@@ -57,23 +57,19 @@ module chaskey_core(
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
-  localparam CTRL_IDLE = 3'h0;
-  localparam CTRL_DONE = 3'h1;
+  localparam CTRL_IDLE   = 3'h0;
+  localparam CTRL_ROUNDS = 3'h1;
+  localparam CTRL_STATE  = 3'h2;
+  localparam CTRL_DONE   = 3'h3;
 
 
   //----------------------------------------------------------------
   // Registers including update variables and write enable.
   //----------------------------------------------------------------
-  reg [127 : 0] key_reg;
-  reg           key_we;
-
+  reg [127 : 0] k_reg;
   reg [127 : 0] k1_reg;
-  reg [127 : 0] k1_new;
-  reg           k1_we;
-
   reg [127 : 0] k2_reg;
-  reg [127 : 0] k2_new;
-  reg           k2_we;
+  reg           k_k1_k2_we;
 
   reg           ready_reg;
   reg           ready_new;
@@ -126,18 +122,18 @@ module chaskey_core(
   // Concurrent connectivity for ports etc.
   //----------------------------------------------------------------
   assign ready = ready_reg;
-  assign tag   = 128'h0;
+  assign tag   = {h0_reg, h1_reg, h2_reg, h3_reg};
 
 
   //----------------------------------------------------------------
   // Internal functions.
   //----------------------------------------------------------------
-  function [127 : 0] double_add(input [127 : 0] op);
+  function [127 : 0] times2(input [127 : 0] op);
     begin
       if (op[127])
-        double_add = {op[126 : 0], 1'h0} ^ 128'h87;
+        times2 = {op[126 : 0], 1'h0} ^ 128'h87;
       else
-        double_add = {op[126 : 0], 1'h0};
+        times2 = {op[126 : 0], 1'h0};
     end
   endfunction
 
@@ -149,7 +145,9 @@ module chaskey_core(
     begin: reg_update
       if (!reset_n)
         begin
-          key_reg        <= 128'h0;
+          k_reg          <= 128'h0;
+          k1_reg         <= 128'h0;
+          k2_reg         <= 128'h0;
           h0_reg         <= 32'h0;
           h1_reg         <= 32'h0;
           h2_reg         <= 32'h0;
@@ -169,10 +167,14 @@ module chaskey_core(
             ready_reg <= ready_new;
 
           if (num_rounds_we)
-            nun_rounds_reg <= num_rounds;
+            num_rounds_reg <= num_rounds;
 
-          if (key_we)
-            key_reg <= key;
+          if (k_k1_k2_we)
+            begin
+              k_reg  <= key;
+              k1_reg <= times2(key);
+              k2_reg <= times2(times2(key));
+            end
 
           if (h0_h3_we)
             begin
@@ -257,6 +259,7 @@ module chaskey_core(
           v0_v3_we = 1'h1;
         end
 
+
       if (update_round)
         begin
           v0_new   = v0_prim2;
@@ -280,10 +283,12 @@ module chaskey_core(
       h3_new   = 32'h0;
       h0_h3_we = 1'h0;
 
+
       if (init_state)
         begin
 
         end
+
 
       if (update_state)
         begin
@@ -330,6 +335,7 @@ module chaskey_core(
     begin : chaskey_core_ctrl
       ready_new     = 1'h0;
       ready_we      = 1'h0;
+      k_k1_k2_we    = 1'h0;
       init_round    = 1'h0;
       update_round  = 1'h0;
       init_state    = 1'h0;
@@ -347,6 +353,7 @@ module chaskey_core(
               begin
                 ready_new     = 1'h0;
                 ready_we      = 1'h1;
+                k_k1_k2_we    = 1'h1;
                 num_rounds_we = 1'h1;
                 core_ctrl_new = CTRL_DONE;
                 core_ctrl_we  = 1'h0;
