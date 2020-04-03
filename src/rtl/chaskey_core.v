@@ -286,18 +286,21 @@ module chaskey_core(
 
       if (init_state)
         begin
-
+          h0_new   = k_reg[127 : 096] ^ block[127 : 096];
+          h0_new   = k_reg[095 : 064] ^ block[095 : 064];
+          h0_new   = k_reg[063 : 032] ^ block[063 : 032];
+          h0_new   = k_reg[031 : 000] ^ block[031 : 000];
+          h0_h3_we = 1'h1;
         end
 
 
       if (update_state)
         begin
-          h0_new   = v0_reg;
-          h1_new   = v1_reg;
-          h2_new   = v2_reg;
-          h3_new   = v3_reg;
+          h0_new   = v0_reg ^ block[127 : 096];
+          h1_new   = v1_reg ^ block[095 : 064];
+          h2_new   = v2_reg ^ block[063 : 032];
+          h3_new   = v3_reg ^ block[031 : 000];
           h0_h3_we = 1'h1;
-
         end
     end // chaskey_core_dp
 
