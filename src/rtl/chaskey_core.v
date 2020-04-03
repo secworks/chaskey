@@ -101,6 +101,10 @@ module chaskey_core(
   reg [31 : 0]  v3_new;
   reg           v0_v3_we;
 
+  reg [127 : 0] tag_reg;
+  reg [127 : 0] tag_new;
+  reg           tag_we;
+
   reg [3 : 0]   num_rounds_reg;
   reg           num_rounds_we;
 
@@ -116,13 +120,15 @@ module chaskey_core(
   reg update_round;
   reg init_state;
   reg update_state;
+  reg update_tag;
+  reg padded_block;
 
 
   //----------------------------------------------------------------
   // Concurrent connectivity for ports etc.
   //----------------------------------------------------------------
   assign ready = ready_reg;
-  assign tag   = {h0_reg, h1_reg, h2_reg, h3_reg};
+  assign tag   = tag_reg;
 
 
   //----------------------------------------------------------------
@@ -156,6 +162,7 @@ module chaskey_core(
           v1_reg         <= 32'h0;
           v2_reg         <= 32'h0;
           v3_reg         <= 32'h0;
+          tag_reg        <= 128'h0;
           ready_reg      <= 1'h1;
           num_rounds_reg <= 4'h0;
           round_ctr_reg  <= 4'h0;
@@ -191,6 +198,9 @@ module chaskey_core(
               v2_reg <= v2_new;
               v3_reg <= v3_new;
             end
+
+          if (tag_we)
+            tag_reg <= tag_new;
 
           if (round_ctr_we)
             round_ctr_reg <= round_ctr_new;
@@ -282,7 +292,8 @@ module chaskey_core(
       h2_new   = 32'h0;
       h3_new   = 32'h0;
       h0_h3_we = 1'h0;
-
+      tag_new  = 128'h0;
+      tag_we   = 1'h0;
 
       if (init_state)
         begin
@@ -301,6 +312,26 @@ module chaskey_core(
           h2_new   = v2_reg ^ block[063 : 032];
           h3_new   = v3_reg ^ block[031 : 000];
           h0_h3_we = 1'h1;
+        end
+
+
+      if (update_tag)
+        begin
+          tag_we = 1'h1;
+          if (padded_block)
+            begin
+              tag_new[127 : 096] = v0_reg ^ k2_reg[127 : 096];
+              tag_new[095 : 064] = v1_reg ^ k2_reg[095 : 064];
+              tag_new[063 : 032] = v2_reg ^ k2_reg[063 : 032];
+              tag_new[031 : 000] = v3_reg ^ k2_reg[031 : 000];
+            end
+          else
+            begin
+              tag_new[127 : 096] = v0_reg ^ k1_reg[127 : 096];
+              tag_new[095 : 064] = v1_reg ^ k1_reg[095 : 064];
+              tag_new[063 : 032] = v2_reg ^ k1_reg[063 : 032];
+              tag_new[031 : 000] = v3_reg ^ k1_reg[031 : 000];
+            end
         end
     end // chaskey_core_dp
 
@@ -346,6 +377,8 @@ module chaskey_core(
       num_rounds_we = 1'h0;
       round_ctr_inc = 1'h0;
       round_ctr_rst = 1'h0;
+      update_tag    = 1'h0;
+      padded_block  = 1'h0;
       core_ctrl_new = CTRL_IDLE;
       core_ctrl_we  = 1'h0;
 
