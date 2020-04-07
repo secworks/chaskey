@@ -243,7 +243,7 @@ module chaskey_core(
 
       v0_prim0 = v0_reg + v1_reg;
       v0_prim1 = {v0_prim0[15 : 0], v0_prim0[31 : 16]};
-      v0_prim2 = v0_prim1 + v3_prim2;
+      v0_prim2 = v0_prim1 + v3_prim1;
 
       v1_prim0 = {v1_reg[26 : 0], v1_reg[31 : 27]};
       v1_prim1 = v1_prim0 ^ v0_prim0;
