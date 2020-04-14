@@ -9,7 +9,7 @@
 
    You should have received a copy of the CC0 Public Domain Dedication along with
    this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
-   
+
    NOTE: This implementation assumes a little-endian architecture
          that does not require aligned memory accesses.
 */
@@ -17,6 +17,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+
+#define DEBUG 1
 
 #define ROTL(x,b) (uint32_t)( ((x) >> (32 - (b))) | ( (x) << (b)) )
 
@@ -27,7 +29,7 @@
     v[0] += v[3]; v[3]=ROTL(v[3],13); v[3] ^= v[0]; \
     v[2] += v[1]; v[1]=ROTL(v[1], 7); v[1] ^= v[2]; v[2]=ROTL(v[2],16); \
   } while(0)
-  
+
 #define PERMUTE \
   ROUND; \
   ROUND; \
@@ -51,7 +53,7 @@ const volatile uint32_t C[2] = { 0x00, 0x87 };
     out[2] = (in[2] << 1) | (in[1] >> 31); \
     out[3] = (in[3] << 1) | (in[2] >> 31); \
   } while(0)
-    
+
 void subkeys(uint32_t k1[4], uint32_t k2[4], const uint32_t k[4]) {
   TIMESTWO(k1,k);
   TIMESTWO(k2,k1);
@@ -66,10 +68,10 @@ void chaskey(uint8_t *tag, uint32_t taglen, const uint8_t *m, const uint32_t mle
   uint8_t lb[16];
   const uint32_t *lastblock;
   uint32_t v[4];
-  
+
   int i;
   uint8_t *p;
-  
+
   assert(taglen <= 16);
 
   v[0] = k[0];
@@ -231,13 +233,13 @@ int test_vectors() {
 #if DEBUG
   printf("K0 %08x %08x %08x %08x\n", k[0], k[1], k[2], k[3]);
   printf("K1 %08x %08x %08x %08x\n", k1[0], k1[1], k1[2], k1[3]);
-  printf("K2 %08x %08x %08x %08x\n", k2[0], k2[1], k2[2], k2[3]);  
+  printf("K2 %08x %08x %08x %08x\n", k2[0], k2[1], k2[2], k2[3]);
 #endif
-  
+
   /* mac */
   for (i = 0; i < 64; i++) {
     m[i] = i;
-    
+
     chaskey(tag, taglen, m, i, (uint32_t*) k, k1, k2);
 
     if (memcmp( tag, vectors[i], taglen )) {
