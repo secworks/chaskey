@@ -92,7 +92,21 @@ void chaskey(uint8_t *tag, uint32_t taglen, const uint8_t *m, const uint32_t mle
       v[1] ^= M[1];
       v[2] ^= M[2];
       v[3] ^= M[3];
-      PERMUTE;
+
+      for (int r = 0 ; r < 12 ; r += 1) {
+#ifdef DEBUG
+        printf("Round %d\n", r);
+        printf("Input:  v[0]: 0x%08x, v[1]: 0x%08x, v[2]: 0x%08x, v[3]: 0x%08x\n", v[0], v[1], v[2], v[3]);
+#endif
+
+        ROUND;
+
+#ifdef DEBUG
+        printf("Output: v[0]: 0x%08x, v[1]: 0x%08x, v[2]: 0x%08x, v[3]: 0x%08x\n", v[0], v[1], v[2], v[3]);
+        printf("\n");
+#endif
+
+      }
     }
   }
 
