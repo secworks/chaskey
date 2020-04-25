@@ -229,6 +229,29 @@ module tb_chaskey_core();
     end
   endtask // init_sim
 
+  //----------------------------------------------------------------
+  //----------------------------------------------------------------
+  task test_chaskey_round_logic;
+    begin : test_chaskey_round_logic
+      $display("--- TC test_chaskey_round_logic started.");
+      $display("--- Forcing registers to test round logic.");
+
+      dut.v0_reg = 32'hffaa5488;
+      dut.v1_reg = 32'haaff0054;
+      dut.v2_reg = 32'h5500ffa9;
+      dut.v3_reg = 32'h0055aafe;
+
+      #(3 * CLK_PERIOD);
+
+      $display("v0_prim2: 0x%08x", dut.chaskey_round_logic.v0_prim2);
+      $display("v1_prim3: 0x%08x", dut.chaskey_round_logic.v1_prim3);
+      $display("v2_prim2: 0x%08x", dut.chaskey_round_logic.v2_prim2);
+      $display("v3_prim3: 0x%08x", dut.chaskey_round_logic.v3_prim3);
+
+      $display("--- TC test_chaskey_round_logic completed.");
+    end
+  endtask // test_chaskey_round_logic
+
 
   //----------------------------------------------------------------
   // chaskey_core_test
@@ -242,6 +265,7 @@ module tb_chaskey_core();
 
       init_sim();
       reset_dut();
+      test_chaskey_round_logic();
 
       display_test_result();
       $display("");
