@@ -22,27 +22,51 @@
 
 #define ROTL(x,b) (uint32_t)( ((x) >> (32 - (b))) | ( (x) << (b)) )
 
+#define SUB_ROUND_1A \
+  v[0] += v[1]; v[1]=ROTL(v[1], 5);
+
+#define SUB_ROUND_1B \
+  v[1] ^= v[0]; v[0]=ROTL(v[0],16);
+
+#define SUB_ROUND_2A \
+  v[2] += v[3]; v[3]=ROTL(v[3], 8);
+
+#define SUB_ROUND_2B \
+  v[3] ^= v[2];
+
+#define SUB_ROUND_3A \
+    v[0] += v[3]; v[3]=ROTL(v[3],13);
+
+#define SUB_ROUND_3B \
+    v[3] ^= v[0];
+
+#define SUB_ROUND_4A \
+  v[2] += v[1]; v[1]=ROTL(v[1], 7);
+
+#define SUB_ROUND_4B \
+  v[1] ^= v[2]; v[2]=ROTL(v[2],16);
+
 #define ROUND \
   do { \
-    v[0] += v[1]; v[1]=ROTL(v[1], 5); v[1] ^= v[0]; v[0]=ROTL(v[0],16); \
-    v[2] += v[3]; v[3]=ROTL(v[3], 8); v[3] ^= v[2]; \
-    v[0] += v[3]; v[3]=ROTL(v[3],13); v[3] ^= v[0]; \
-    v[2] += v[1]; v[1]=ROTL(v[1], 7); v[1] ^= v[2]; v[2]=ROTL(v[2],16); \
+    printf("\n"); \
+    SUB_ROUND_1A; \
+    printf("SUB_ROUND_1A: v[0]: 0x%08x, v[1]: 0x%08x \n", v[0], v[1]); \
+    SUB_ROUND_1B; \
+    printf("SUB_ROUND_1A: v[0]: 0x%08x, v[1]: 0x%08x \n", v[0], v[1]); \
+    SUB_ROUND_2A; \
+    printf("SUB_ROUND_2A: v[2]: 0x%08x, v[3]: 0x%08x \n", v[2], v[3]); \
+    SUB_ROUND_2B; \
+    printf("SUB_ROUND_2B: v[2]: 0x%08x, v[3]: 0x%08x \n", v[2], v[3]); \
+    SUB_ROUND_3A; \
+    printf("SUB_ROUND_3A: v[0]: 0x%08x, v[3]: 0x%08x \n", v[0], v[3]); \
+    SUB_ROUND_3B; \
+    printf("SUB_ROUND_3B: v[0]: 0x%08x, v[3]: 0x%08x \n", v[0], v[3]); \
+    SUB_ROUND_4A; \
+    printf("SUB_ROUND_4A: v[1]: 0x%08x, v[2]: 0x%08x \n", v[1], v[2]); \
+    SUB_ROUND_4B; \
+    printf("SUB_ROUND_4B: v[1]: 0x%08x, v[2]: 0x%08x \n", v[1], v[2]); \
+    printf("\n"); \
   } while(0)
-
-#define PERMUTE \
-  ROUND; \
-  ROUND; \
-  ROUND; \
-  ROUND; \
-  ROUND; \
-  ROUND; \
-  ROUND; \
-  ROUND; \
-  ROUND; \
-  ROUND; \
-  ROUND; \
-  ROUND;
 
 const volatile uint32_t C[2] = { 0x00, 0x87 };
 
@@ -144,7 +168,20 @@ void chaskey(uint8_t *tag, uint32_t taglen, const uint8_t *m, const uint32_t mle
   v[2] ^= l[2];
   v[3] ^= l[3];
 
-  PERMUTE;
+      for (int r = 0 ; r < 12 ; r += 1) {
+#ifdef DEBUG
+        printf("Round %d\n", r);
+        printf("Input:  v[0]: 0x%08x, v[1]: 0x%08x, v[2]: 0x%08x, v[3]: 0x%08x\n", v[0], v[1], v[2], v[3]);
+#endif
+
+        ROUND;
+
+#ifdef DEBUG
+        printf("Output: v[0]: 0x%08x, v[1]: 0x%08x, v[2]: 0x%08x, v[3]: 0x%08x\n", v[0], v[1], v[2], v[3]);
+        printf("\n");
+#endif
+
+      }
 
 #ifdef DEBUG
   printf("(%3d) v[0] %08x\n", mlen, v[0]);
