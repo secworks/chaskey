@@ -242,22 +242,26 @@ module chaskey_core(
       v0_v3_we = 1'h0;
 
       v0_prim0 = v0_reg + v1_reg;
-      v0_prim1 = {v0_prim0[15 : 0], v0_prim0[31 : 16]};
-      v0_prim2 = v0_prim1 + v3_prim1;
-
       v1_prim0 = {v1_reg[26 : 0], v1_reg[31 : 27]};
+
+      v0_prim1 = {v0_prim0[15 : 0], v0_prim0[31 : 16]};
       v1_prim1 = v1_prim0 ^ v0_prim0;
-      v1_prim2 = {v1_reg[24 : 0], v1_reg[31 : 25]};
-      v1_prim3 = v1_prim2 ^ v2_prim1;
 
       v2_prim0 = v2_reg + v3_reg;
-      v2_prim1 = v2_prim0 + v1_prim1;
-      v2_prim2 = {v2_prim1[15 : 0], v2_prim1[31 : 16]};
-
       v3_prim0 = {v3_reg[23 : 0], v3_reg[31 : 24]};
+
       v3_prim1 = v3_prim0 ^ v2_prim0;
+
+      v0_prim2 = v0_prim1 + v3_prim1;
       v3_prim2 = {v3_prim1[18 : 0], v3_prim1[31 : 19]};
+
       v3_prim3 = v3_prim2 ^ v0_prim2;
+
+      v1_prim2 = {v1_prim1[24 : 0], v1_prim1[31 : 25]};
+      v2_prim1 = v1_prim1 + v2_prim0;
+
+      v1_prim3 = v1_prim2 ^ v2_prim1;
+      v2_prim2 = {v2_prim1[15 : 0], v2_prim1[31 : 16]};
 
 
       if (init_round)

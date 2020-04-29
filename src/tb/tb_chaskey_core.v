@@ -229,26 +229,63 @@ module tb_chaskey_core();
     end
   endtask // init_sim
 
+
   //----------------------------------------------------------------
+  // test_chaskey_round_logic
+  // Test the round logic separately.
   //----------------------------------------------------------------
   task test_chaskey_round_logic;
     begin : test_chaskey_round_logic
+      integer rl_errors;
+
       $display("--- TC test_chaskey_round_logic started.");
       $display("--- Forcing registers to test round logic.");
+
+      rl_errors = 0;
 
       dut.v0_reg = 32'hffaa5488;
       dut.v1_reg = 32'haaff0054;
       dut.v2_reg = 32'h5500ffa9;
       dut.v3_reg = 32'h0055aafe;
 
-      #(3 * CLK_PERIOD);
+      #(CLK_PERIOD);
 
-      $display("v0_prim2: 0x%08x", dut.chaskey_round_logic.v0_prim2);
-      $display("v1_prim3: 0x%08x", dut.chaskey_round_logic.v1_prim3);
-      $display("v2_prim2: 0x%08x", dut.chaskey_round_logic.v2_prim2);
-      $display("v3_prim3: 0x%08x", dut.chaskey_round_logic.v3_prim3);
+      if (dut.chaskey_round_logic.v0_prim2 != 32'h55d8ff50)
+        begin
+          $display("Error for v0_prim2. Expected 0x55d8ff50. Got 0x%08x",
+                   dut.chaskey_round_logic.v0_prim2);
+          rl_errors = rl_errors + 1;
+        end
 
-      $display("--- TC test_chaskey_round_logic completed.");
+      if (dut.chaskey_round_logic.v1_prim3 != 32'hee0f2c0a)
+        begin
+          $display("Error for v1_prim3. Expected 0xee0f2c0a. Got 0x%08x",
+                   dut.chaskey_round_logic.v1_prim3);
+          rl_errors = rl_errors + 1;
+        end
+
+      if (dut.chaskey_round_logic.v2_prim2 != 32'h08f04aa0)
+        begin
+          $display("Error for v2_prim2. Expected 0x08f04aa0. Got 0x%08x",
+                   dut.chaskey_round_logic.v2_prim2);
+          rl_errors = rl_errors + 1;
+        end
+
+      if (dut.chaskey_round_logic.v3_prim3 != 32'hdf4c1f4f)
+        begin
+          $display("Error for v2_prim2. Expected 0xdf4c1f4f. Got 0x%08x",
+                   dut.chaskey_round_logic.v3_prim3);
+          rl_errors = rl_errors + 1;
+        end
+
+      if (rl_errors == 0)
+        $display("--- TC test_chaskey_round_logic completed without errors.");
+      else
+        begin
+          error_ctr = error_ctr + rl_errors;
+          $display("--- TC test_chaskey_round_logic completed with %d errors.",
+                   rl_errors);
+        end
     end
   endtask // test_chaskey_round_logic
 
