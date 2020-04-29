@@ -23,48 +23,48 @@
 #define ROTL(x,b) (uint32_t)( ((x) >> (32 - (b))) | ( (x) << (b)) )
 
 #define SUB_ROUND_1A \
-  v[0] += v[1]; v[1]=ROTL(v[1], 5);
+  v[0] += v[1]; v[1]=ROTL(v[1], 5); \
+  printf("v0_prim0 0x%08x, v1_prim0: 0x%08x \n", v[0], v[1]);
 
 #define SUB_ROUND_1B \
-  v[1] ^= v[0]; v[0]=ROTL(v[0],16);
+  v[1] ^= v[0]; v[0]=ROTL(v[0],16); \
+  printf("v0_prim1 0x%08x, v1_prim1: 0x%08x \n", v[0], v[1]);
 
 #define SUB_ROUND_2A \
-  v[2] += v[3]; v[3]=ROTL(v[3], 8);
+  v[2] += v[3]; v[3]=ROTL(v[3], 8); \
+  printf("v2_prim0 0x%08x, v3_prim0: 0x%08x \n", v[2], v[3]);
 
 #define SUB_ROUND_2B \
-  v[3] ^= v[2];
+  v[3] ^= v[2]; \
+  printf("v3_prim1 0x%08x \n", v[3]);
 
 #define SUB_ROUND_3A \
-    v[0] += v[3]; v[3]=ROTL(v[3],13);
+  v[0] += v[3]; v[3]=ROTL(v[3],13); \
+  printf("v0_prim2 0x%08x, v3_prim2: 0x%08x \n", v[0], v[3]);
 
 #define SUB_ROUND_3B \
-    v[3] ^= v[0];
+  v[3] ^= v[0]; \
+  printf("v3_prim3 0x%08x \n", v[3]);
 
 #define SUB_ROUND_4A \
-  v[2] += v[1]; v[1]=ROTL(v[1], 7);
+  v[2] += v[1]; v[1]=ROTL(v[1], 7); \
+  printf("v1_prim2 0x%08x, v2_prim1: 0x%08x \n", v[1], v[2]);
 
 #define SUB_ROUND_4B \
-  v[1] ^= v[2]; v[2]=ROTL(v[2],16);
+  v[1] ^= v[2]; v[2]=ROTL(v[2],16); \
+  printf("v1_prim3 0x%08x, v2_prim2: 0x%08x \n", v[1], v[2]);
 
 #define ROUND \
   do { \
     printf("\n"); \
     SUB_ROUND_1A; \
-    printf("SUB_ROUND_1A: v[0]: 0x%08x, v[1]: 0x%08x \n", v[0], v[1]); \
     SUB_ROUND_1B; \
-    printf("SUB_ROUND_1A: v[0]: 0x%08x, v[1]: 0x%08x \n", v[0], v[1]); \
     SUB_ROUND_2A; \
-    printf("SUB_ROUND_2A: v[2]: 0x%08x, v[3]: 0x%08x \n", v[2], v[3]); \
     SUB_ROUND_2B; \
-    printf("SUB_ROUND_2B: v[2]: 0x%08x, v[3]: 0x%08x \n", v[2], v[3]); \
     SUB_ROUND_3A; \
-    printf("SUB_ROUND_3A: v[0]: 0x%08x, v[3]: 0x%08x \n", v[0], v[3]); \
     SUB_ROUND_3B; \
-    printf("SUB_ROUND_3B: v[0]: 0x%08x, v[3]: 0x%08x \n", v[0], v[3]); \
     SUB_ROUND_4A; \
-    printf("SUB_ROUND_4A: v[1]: 0x%08x, v[2]: 0x%08x \n", v[1], v[2]); \
     SUB_ROUND_4B; \
-    printf("SUB_ROUND_4B: v[1]: 0x%08x, v[2]: 0x%08x \n", v[1], v[2]); \
     printf("\n"); \
   } while(0)
 
