@@ -70,6 +70,10 @@
 
 const volatile uint32_t C[2] = { 0x00, 0x87 };
 
+
+//------------------------------------------------------------------
+// subkeys and TIMESTWO macro.
+//------------------------------------------------------------------
 #define TIMESTWO(out,in) \
   do { \
     out[0] = (in[0] << 1) ^ C[in[3] >> 31]; \
@@ -78,12 +82,27 @@ const volatile uint32_t C[2] = { 0x00, 0x87 };
     out[3] = (in[3] << 1) | (in[2] >> 31); \
   } while(0)
 
+
 void subkeys(uint32_t k1[4], uint32_t k2[4], const uint32_t k[4]) {
+  printf("Running subkeys:\n");
   TIMESTWO(k1,k);
+  printf("TIMESTWO of 0x%08x 0x%08x 0x%08x 0x%08x => 0x%08x 0x%08x 0x%08x 0x%08x\n",
+         k[0], k[1], k[2], k[3], k1[0], k1[1], k1[2], k1[3]);
   TIMESTWO(k2,k1);
+  printf("TIMESTWO of 0x%008x 0x%08x 0x%08x 0x%08x => 0x%08x 0x%08x 0x%08x 0x%08x\n",
+         k1[0], k1[1], k1[2], k1[3], k2[0], k2[1], k2[2], k2[3]);
+  printf("\n");
 }
 
+
+//------------------------------------------------------------------
+// chaskey.
+//------------------------------------------------------------------
 void chaskey(uint8_t *tag, uint32_t taglen, const uint8_t *m, const uint32_t mlen, const uint32_t k[4], const uint32_t k1[4], const uint32_t k2[4]) {
+  printf("\n");
+  printf("Running chaskey.\n");
+  printf("message length: %d\n", mlen);
+  printf("\n");
 
   const uint32_t *M = (uint32_t*) m;
   const uint32_t *end = M + (((mlen-1)>>4)<<2); /* pointer to last message block */
@@ -133,6 +152,8 @@ void chaskey(uint8_t *tag, uint32_t taglen, const uint8_t *m, const uint32_t mle
       }
     }
   }
+
+  printf("Performing padding of final block.\n");
 
   if ((mlen != 0) && ((mlen & 0xF) == 0)) {
     l = k1;
@@ -196,9 +217,14 @@ void chaskey(uint8_t *tag, uint32_t taglen, const uint8_t *m, const uint32_t mle
   v[3] ^= l[3];
 
   memcpy(tag,v,taglen);
+  printf("Chaskey completed.\n");
 
 }
 
+
+//------------------------------------------------------------------
+// Test functionality including test vectors.
+//------------------------------------------------------------------
 const uint8_t vectors[64][8] =
 {
   { 0xdd, 0x3e, 0x18, 0x49, 0xd6, 0x82, 0x45, 0x55 },
